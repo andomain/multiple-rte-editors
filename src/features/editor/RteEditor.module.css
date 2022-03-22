@@ -1,0 +1,17 @@
+.RteEditor {
+  border: 1px solid black;
+  margin-bottom: 10px;
+}
+
+.display.active {
+  background: lightcoral;
+}
+
+.Buttons {
+  display: flex;
+  margin-bottom:10px;
+}
+
+.Buttons button {
+  margin: 0 5px;
+}

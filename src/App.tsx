@@ -1,58 +1,66 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
+import { useAppDispatch } from './app/hooks';
+import {
+    addEditor,
+    initEditorState,
+    setActiveEditor,
+    updateEditor,
+} from './features/editor/editorSlice';
+import { RootState } from './app/store';
+
+import RteEditor from './features/editor/RteEditor';
+
+import { ContentState, convertToRaw } from 'draft-js';
+import EditorDisplay from './features/editor/EditorDisplay';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+
 import './App.css';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
-    </div>
-  );
+    const editorState = useSelector((state: RootState) => state.editor);
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(initEditorState());
+    }, [dispatch]);
+
+    // Write editor state to Mock DB/localstorage
+    useEffect(() => {
+        localStorage.setItem('editorDb', JSON.stringify(editorState.editors));
+    }, [editorState]);
+
+    // Update editor by ID
+    const changeHandler = (id: string) => (content: ContentState) => {
+        dispatch(updateEditor({ id, content: convertToRaw(content) }));
+    };
+
+    // Select active editor
+    const selectHandler = (id: string) => {
+        dispatch(setActiveEditor(id));
+    };
+
+    return (
+        <div className="App">
+            <div>
+                <button type="button" onClick={() => dispatch(addEditor())}>
+                    Add editor
+                </button>
+            </div>
+            <div>
+                {Object.entries(editorState.editors).map(([id, editor]) => (
+                    <RteEditor
+                        key={id}
+                        value={editor}
+                        onChange={changeHandler(id)}
+                        onSelect={() => selectHandler(id)}
+                    />
+                ))}
+            </div>
+            <div>
+                <EditorDisplay />
+            </div>
+        </div>
+    );
 }
 
 export default App;
