@@ -9,11 +9,9 @@ It is bootstrapped with CRA & the `redux-typescript` template.
 Clone the repo, `cd` into it and run
 
 ```
-// Yarn
-yarn install
-
 // npm
 npm install
+npm run start
 ```
 
 The app should run on the first available port `300x`
